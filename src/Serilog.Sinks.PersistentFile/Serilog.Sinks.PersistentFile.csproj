@@ -2,9 +2,10 @@
 
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
+    <TargetFrameworks>netstandard2.0;net8.0</TargetFrameworks>
+    <LangVersion>10.0</LangVersion>
     <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
     <Version>4.1.0</Version>
   </PropertyGroup>
 
@@ -12,6 +13,9 @@
     <PackageReference Include="serilog" Version="3.1.1" />
   </ItemGroup>
 
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+  </ItemGroup>
+  
   <PropertyGroup>
     <DefineConstants>$(DefineConstants);ATOMIC_APPEND;HRESULTS</DefineConstants>
     <AssemblyVersion>2.3.0.0</AssemblyVersion>
