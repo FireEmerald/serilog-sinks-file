@@ -70,13 +70,12 @@ namespace Serilog.Sinks.PersistentFile
             // exposed by .NET Core.
             _fileOutput = new FileStream(
                 path,
-                new FileStreamOptions{
-                    Access = FileAccess.Write,
-                    BufferSize = _fileStreamBufferLength,
-                    Mode = FileMode.Append,
-                    Options = FileOptions.None,
-                    Share = FileShare.ReadWrite
-                });
+                FileMode.Append,
+                FileAccess.ReadWrite,
+                FileShare.ReadWrite,
+                _fileStreamBufferLength,
+                FileOptions.None
+                );
 
             _writeBuffer = new MemoryStream();
             _output = new StreamWriter(_writeBuffer,
@@ -101,12 +100,11 @@ namespace Serilog.Sinks.PersistentFile
 
                         _fileOutput = new FileStream(
                             _path,
-                            new FileStreamOptions{
-                                Access = FileAccess.Write,
-                                Mode = FileMode.Append,
-                                Options = FileOptions.None,
-                                Share = FileShare.ReadWrite
-                            });
+                            FileMode.Append,
+                            FileAccess.ReadWrite,
+                            FileShare.ReadWrite,
+                            length,
+                            FileOptions.None);
                         _fileStreamBufferLength = length;
 
                         oldOutput.Dispose();
