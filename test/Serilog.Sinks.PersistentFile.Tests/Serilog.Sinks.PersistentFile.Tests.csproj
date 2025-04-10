@@ -22,7 +22,7 @@
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <TargetFrameworks>netstandard2.0;net8.0</TargetFrameworks>
-    <LangVersion>latest</LangVersion>
+    <LangVersion>default</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <IsTestProject>true</IsTestProject>
   </PropertyGroup>
