@@ -65,17 +65,16 @@ namespace Serilog.Sinks.PersistentFile
             {
                 Directory.CreateDirectory(directory);
             }
-
+            
             // FileSystemRights.AppendData sets the Win32 FILE_APPEND_DATA flag. On Linux this is O_APPEND, but that API is not yet
             // exposed by .NET Core.
             _fileOutput = new FileStream(
                 path,
                 FileMode.Append,
-                FileAccess.ReadWrite,
+                FileAccess.Write,
                 FileShare.ReadWrite,
                 _fileStreamBufferLength,
-                FileOptions.None
-                );
+                FileOptions.None);
 
             _writeBuffer = new MemoryStream();
             _output = new StreamWriter(_writeBuffer,
@@ -98,10 +97,10 @@ namespace Serilog.Sinks.PersistentFile
                     {
                         var oldOutput = _fileOutput;
 
-                        _fileOutput = new FileStream(
+                         _fileOutput = new FileStream(
                             _path,
                             FileMode.Append,
-                            FileAccess.ReadWrite,
+                            FileAccess.Write,
                             FileShare.ReadWrite,
                             length,
                             FileOptions.None);
