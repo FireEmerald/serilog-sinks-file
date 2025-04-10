@@ -23,6 +23,7 @@
     <OutputType>Library</OutputType>
     <TargetFrameworks>netstandard2.0;net8.0</TargetFrameworks>
     <LangVersion>default</LangVersion>
+    <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <IsTestProject>true</IsTestProject>
   </PropertyGroup>
