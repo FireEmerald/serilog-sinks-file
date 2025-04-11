@@ -33,7 +33,40 @@ foreach ($src in ls src/*) {
 
     Pop-Location
 }
+# download nuget.exe and put in in the bld/nuget folder
+$bldDir = Join-Path $PSScriptRoot "bld"
+if (-Not (Test-Path $bldDir)) {
+    New-Item -ItemType Directory -Path $bldDir | Out-Null
+}
 
+$nuget = "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe"
+$nugetDir = Join-Path $bldDir "nuget"
+if (-Not (Test-Path $nugetDir)) {
+    echo "build: Creating nuget directory $nugetDir"
+    New-Item -ItemType Directory -Path $nugetDir | Out-Null
+}
+
+$nugetPath = Join-Path $nugetDir "nuget.exe"
+if(!(Test-Path $nugetPath)) {
+    echo "build: Downloading nuget.exe to $nugetPath"
+    Invoke-WebRequest -Uri $nuget -OutFile $nugetPath
+}
+
+
+echo "build: Installing xunit.runner.console NuGet package"
+
+& $nugetPath install xunit.runner.console -Version 2.9.3 -OutputDirectory $bldDir
+if ($LASTEXITCODE -ne 0) { exit 2 }
+$xcrPath = Join-Path $bldDir "xunit.runner.console.2.9.3/tools/net6.0/xunit.console.exe"
+if (-Not (Test-Path $xcrPath)) {
+    echo "build: xunit.runner.console not found at $xcrPath"
+    exit 2
+}
+$xcrNet60Path = "$bldDir/xunit.runner.console.2.9.3/tools/net6.0"
+echo "build: xunit.runner.console found at $bldDir"
+echo "build: xunit.runner.console net6.0 found at $xcrNet60Path"
+
+if ($LASTEXITCODE -ne 0) { exit 2 }
 foreach ($test in ls test/*.Tests) {
     Push-Location $test
 
@@ -41,9 +74,9 @@ foreach ($test in ls test/*.Tests) {
 
     & dotnet test -c Release -f  net8.0
     & dotnet test -c Release -f  net472
-    # & z:\temp\nuget\xunit.runner.console.2.9.3\tools\net6.0\xunit.console.exe z:\downloads\github\forks\serilog-sinks-file\test\Serilog.Sinks.PersistentFile.Tests\bin\Release\netstandard2.0\Serilog.Sinks.PersistentFile.Tests.dll
+    & dotnet build -c Release -f  netstandard2.0 
+    & $xcrPath ./bin/Release/netstandard2.0/Serilog.Sinks.PersistentFile.Tests.dll
     if($LASTEXITCODE -ne 0) { exit 3 }
-
     Pop-Location
 }
 
