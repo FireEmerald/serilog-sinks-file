@@ -41,6 +41,7 @@ foreach ($test in ls test/*.Tests) {
 
     & dotnet test --no-build -c Release -f  net8.0
     & dotnet test --no-build -c Release -f  net472
+    # & z:\temp\nuget\xunit.runner.console.2.9.3\tools\net6.0\xunit.console.exe z:\downloads\github\forks\serilog-sinks-file\test\Serilog.Sinks.PersistentFile.Tests\bin\Release\netstandard2.0\Serilog.Sinks.PersistentFile.Tests.dll
     if($LASTEXITCODE -ne 0) { exit 3 }
 
     Pop-Location
