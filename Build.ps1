@@ -39,7 +39,8 @@ foreach ($test in ls test/*.Tests) {
 
 	echo "build: Testing project in $test"
 
-    & dotnet test -c Release
+    & dotnet test --no-build -c Release -f  net8.0
+    & dotnet test --no-build -c Release -f  net472
     if($LASTEXITCODE -ne 0) { exit 3 }
 
     Pop-Location
