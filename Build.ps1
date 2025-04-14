@@ -39,6 +39,9 @@ if (-Not (Test-Path $bldDir)) {
     New-Item -ItemType Directory -Path $bldDir | Out-Null
 }
 
+# download xunit.runner.console from nuget.org and put in bld/nuget folder ONLY if running on Windows
+if ($PSVersionTable.Platform -eq "Win32NT") {
+
 $nuget = "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe"
 $nugetDir = Join-Path $bldDir "nuget"
 if (-Not (Test-Path $nugetDir)) {
@@ -50,21 +53,21 @@ $nugetPath = Join-Path $nugetDir "nuget.exe"
 if(!(Test-Path $nugetPath)) {
     echo "build: Downloading nuget.exe to $nugetPath"
     Invoke-WebRequest -Uri $nuget -OutFile $nugetPath
+    }
+
+    echo "build: Installing xunit.runner.console NuGet package"
+
+    & $nugetPath install xunit.runner.console -Version 2.9.3 -OutputDirectory $bldDir
+    if ($LASTEXITCODE -ne 0) { exit 2 }
+    $xcrPath = Join-Path $bldDir "xunit.runner.console.2.9.3/tools/net6.0/xunit.console.exe"
+    if (-Not (Test-Path $xcrPath)) {
+        echo "build: xunit.runner.console not found at $xcrPath"
+        exit 2
+    }
+    $xcrNet60Path = "$bldDir/xunit.runner.console.2.9.3/tools/net6.0"
+    echo "build: xunit.runner.console found at $bldDir"
+    echo "build: xunit.runner.console net6.0 found at $xcrNet60Path"
 }
-
-
-echo "build: Installing xunit.runner.console NuGet package"
-
-& $nugetPath install xunit.runner.console -Version 2.9.3 -OutputDirectory $bldDir
-if ($LASTEXITCODE -ne 0) { exit 2 }
-$xcrPath = Join-Path $bldDir "xunit.runner.console.2.9.3/tools/net6.0/xunit.console.exe"
-if (-Not (Test-Path $xcrPath)) {
-    echo "build: xunit.runner.console not found at $xcrPath"
-    exit 2
-}
-$xcrNet60Path = "$bldDir/xunit.runner.console.2.9.3/tools/net6.0"
-echo "build: xunit.runner.console found at $bldDir"
-echo "build: xunit.runner.console net6.0 found at $xcrNet60Path"
 
 if ($LASTEXITCODE -ne 0) { exit 2 }
 foreach ($test in ls test/*.Tests) {
@@ -75,7 +78,10 @@ foreach ($test in ls test/*.Tests) {
     & dotnet test -c Release -f  net8.0
     & dotnet test -c Release -f  net472
     & dotnet build -c Release -f  netstandard2.0 
-    & $xcrPath ./bin/Release/netstandard2.0/Serilog.Sinks.PersistentFile.Tests.dll
+    #only run xunit.runner.console on Windows
+    if ($PSVersionTable.Platform -eq "Win32NT") {
+        & $xcrPath ./bin/Release/netstandard2.0/Serilog.Sinks.PersistentFile.Tests.dll
+    }
     if($LASTEXITCODE -ne 0) { exit 3 }
     Pop-Location
 }
